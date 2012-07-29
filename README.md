@@ -13,7 +13,7 @@ app.configure('development', function(){
     extensions: ['handlebars', 'hbs'],
     minify: true, //run result through uglify-js
     watch: true, //recompile on file changes
-    template_name: function(t) { return t.replace(/\//, '-'); } //callback to modify the template names to whatever you like
+    template_name: function(t) { return t.replace(/\//, '-'); } //callback to modify the template names
   });
 });
 ```

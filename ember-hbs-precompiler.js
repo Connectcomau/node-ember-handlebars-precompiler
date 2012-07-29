@@ -1,8 +1,9 @@
 // ported from https://github.com/Connectcomau/node-handlebars-precompiler
+// incorporating this https://gist.github.com/2013669
 
 var fs = require('fs');
+var vm = require('vm');
 var file = require('file');
-var handlebars = require('handlebars');
 var basename = require('path').basename;
 var uglify = require('uglify-js');
 
@@ -27,13 +28,60 @@ function process_template(template, root, opts, output) {
 	} else {
 		var data = fs.readFileSync(template, 'utf8');
 
-		// Clean the template name
+		// set the template name
 		if ( ! root) template = basename(template);
 		else if (template.indexOf(root) === 0) template = template.substring(root.length+1);
 
-		if (typeof(opts.template_name) === 'function') template = opts.template_name(template);
 		template = template.replace(opts.file_regex, '');
-		output.push('\ntemplates[\'' + template + '\'] = template(' + handlebars.precompile(data) + ');\n');
+		if (typeof(opts.template_name) === 'function') template = opts.template_name(template);
+
+		// set up the vm context
+		//dummy jQuery
+		var jQuery = function() { return jQuery; };
+		jQuery.ready = function() { return jQuery; };
+		jQuery.inArray = function() { return jQuery; };
+		jQuery.jquery = "1.7.1";
+
+		//dummy DOM element
+		var element = {
+			firstChild: function () { return element; },
+			innerHTML: function () { return element; }
+		};
+
+		var sandbox = {
+			// DOM
+			document: {
+				createRange: false,
+				createElement: function() { return element; }
+			},
+
+			// Console
+			console: console,
+
+			// jQuery
+			jQuery: jQuery,
+			$: jQuery,
+
+			// handlebars template to compile
+			template: data,
+
+			// compiled handlebars template
+			templatejs: null
+		};
+
+		// window
+		sandbox.window = sandbox;
+
+		// create a context for the vm using the sandbox data
+		var context = vm.createContext(sandbox);
+
+		// load Ember into the sandbox
+		vm.runInContext(opts.emberjs_data, context, 'ember.js');
+
+		//compile the handlebars template inside the vm context
+		vm.runInContext('templatejs = Ember.Handlebars.precompile(template).toString();', context);
+
+		output.push('\ntemplates[\'' + template + '\'] = template(' + context.templatejs + ');\n');
 	}
 }
 
@@ -41,8 +89,10 @@ function do_precompile(opts) {
 	//check all files first
 	check_files(opts);
 
+	// cache a copy of the emberjs data
+	opts.emberjs_data = fs.readFileSync(opts.emberjs, 'utf8');
 	var output = [];
-	output.push('(function() {\n  var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};\n');
+	output.push('(function() {\n  var template = Ember.Handlebars.template, templates = Ember.TEMPLATES = Ember.TEMPLATES || {};\n');
 
 	process_template(opts.src, null, opts, output);
 
@@ -73,7 +123,7 @@ function compile(opts) {
 	if (opts.watch) {
 		function compile_on_change(event, filename) {
 			console.log('[' + event + '] detected in ' + (filename ? filename : '[filename not supported]'));
-			compile(opts);
+			do_precompile(opts);
 		}
 
 		console.log('[watching] ' + opts.src);
