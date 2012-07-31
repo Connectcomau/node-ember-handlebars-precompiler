@@ -118,7 +118,8 @@ function compile(opts) {
 	opts.file_regex = /\.handlebars$/;
 	if (opts.extensions) opts.file_regex = new RegExp('\.' + opts.extensions.join('$|\.') + '$');
 
-	var result = do_precompile(opts);
+	var result = null;
+	if ( ! opts.ignore_load) result = do_precompile(opts);
 
 	if (opts.watch) {
 		function compile_on_change(event, filename) {
