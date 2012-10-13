@@ -41,6 +41,7 @@ function process_template(template, root, opts, output) {
 		jQuery.ready = function() { return jQuery; };
 		jQuery.inArray = function() { return jQuery; };
 		jQuery.jquery = "1.7.1";
+		jQuery.event = { fixHooks: {} }
 
 		//dummy DOM element
 		var element = {
