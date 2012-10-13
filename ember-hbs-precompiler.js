@@ -77,6 +77,7 @@ function process_template(template, root, opts, output) {
 		var context = vm.createContext(sandbox);
 
 		// load Ember into the sandbox
+		if (opts.handlebars_data) vm.runInContext(opts.handlebars_data, context, 'handlebars.js');
 		vm.runInContext(opts.emberjs_data, context, 'ember.js');
 
 		//compile the handlebars template inside the vm context
@@ -91,6 +92,7 @@ function do_precompile(opts) {
 	check_files(opts);
 
 	// cache a copy of the emberjs data
+	if (opts.handlebars) opts.handlebars_data = fs.readFileSync(opts.handlebars, 'utf8');
 	opts.emberjs_data = fs.readFileSync(opts.emberjs, 'utf8');
 	var output = [];
 	output.push('(function() {\n  var template = Ember.Handlebars.template, templates = Ember.TEMPLATES = Ember.TEMPLATES || {};\n');

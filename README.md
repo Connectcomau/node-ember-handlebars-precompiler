@@ -7,6 +7,7 @@ This is how you might use it in an Express project.
 ```javascript
 app.configure('development', function(){
   require('./lib/ember-precompiler').compile({
+  	handlebars: __dirname + '/public/javascripts/handlebars-1.0.rc.1.js', //optional as it is no longer included with ember > 1.0
   	emberjs: __dirname + '/public/javascripts/ember-0.9.8.1.min.js',
     src: __dirname + '/views', 
     dest: __dirname + '/public/javascripts/templates.js',
