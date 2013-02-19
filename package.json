@@ -1,7 +1,7 @@
 {
   "name": "ember-handlebars-precompiler",
   "description": "Ember.js Handlebars precompiler node module",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "homepage": "https://github.com/Connectcomau/node-ember-handlebars-precompiler",
   "keywords": [
     "ember handlebars mustache template html compiler"
@@ -18,5 +18,11 @@
     "file": "~0.2"
   },
   "devDependencies": {},
-  "main": "ember-hbs-precompiler.js"
+  "main": "ember-hbs-precompiler.js",
+  "license": "MIT",
+  "author": {
+    "name": "Nathan Miller",
+    "email": "batman@connect.com.au",
+    "url": "http://connect.com.au"
+  }
 }
