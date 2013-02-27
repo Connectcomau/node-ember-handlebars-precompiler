@@ -31,7 +31,8 @@ e.g. `Ember.TEMPLATES['users/show']` you can change the template name using the 
 
 Current version of ember 1.0 rc1 has some code which breaks when run in a vm context. To have this work you need to look for this which is duplicated twice in the file and add in the check to see if childNodes exists otherwise it just throws.
 
-```// IE 8 (and likely earlier) likes to move whitespace preceeding
+```javascript
+// IE 8 (and likely earlier) likes to move whitespace preceeding
 // a script tag to appear after it. This means that we can
 // accidentally remove whitespace when updating a morph.
 movesWhitespace = (function() {
