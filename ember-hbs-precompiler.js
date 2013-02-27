@@ -6,6 +6,7 @@ var vm = require('vm');
 var file = require('file');
 var basename = require('path').basename;
 var uglify = require('uglify-js');
+var watcher = require('node-watch');
 
 function check_files(opts) {
 	try { fs.statSync(opts.src); } 
@@ -41,7 +42,7 @@ function process_template(template, root, opts, output) {
 		jQuery.ready = function() { return jQuery; };
 		jQuery.inArray = function() { return jQuery; };
 		jQuery.jquery = "1.9.1";
-		jQuery.event = { fixHooks: {} }
+		jQuery.event = { fixHooks: {} };
 
 		//dummy DOM element
 		var element = {
@@ -119,31 +120,23 @@ function do_precompile(opts) {
 
 function compile(opts) {
 	opts.file_regex = /\.handlebars$/;
-	if (opts.extensions) opts.file_regex = new RegExp('\.' + opts.extensions.join('$|\.') + '$');
+	if (opts.extensions) opts.file_regex = new RegExp('\\.' + opts.extensions.join('$|\\.') + '$');
 
 	var result = null;
 	if ( ! opts.ignore_load) result = do_precompile(opts);
 
+	function compile_on_change(filename) {
+		console.log('change detected in ' + (filename ? filename : '[filename not supported]'));
+		do_precompile(opts);
+	}
+
 	if (opts.watch) {
-		function compile_on_change(event, filename) {
-			console.log('[' + event + '] detected in ' + (filename ? filename : '[filename not supported]'));
-			do_precompile(opts);
-		}
-
 		console.log('[watching] ' + opts.src);
-
-		file.walk(opts.src, function(_, dirPath, dirs, files) {
-			if ( ! files) throw 'No files to watch...'
-
-			for(var i = 0; i < files.length; i++) {
-				if (opts.file_regex.test(files[i])) {
-					fs.watch(files[i], compile_on_change);
-				}
-			}
-		});
+		watcher(opts.src, compile_on_change);
 	}
 
 	return result;
 }
 
-exports.compile = compile
+module.exports.compile = compile;
+

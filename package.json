@@ -1,7 +1,7 @@
 {
   "name": "ember-handlebars-precompiler",
   "description": "Ember.js Handlebars precompiler node module",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "homepage": "https://github.com/Connectcomau/node-ember-handlebars-precompiler",
   "keywords": [
     "ember handlebars mustache template html compiler"
@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "uglify-js": "~1.2",
-    "file": "~0.2"
+    "file": "~0.2",
+    "node-watch": "~0.2.8"
   },
   "devDependencies": {},
   "main": "ember-hbs-precompiler.js",
